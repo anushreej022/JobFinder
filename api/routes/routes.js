@@ -9,13 +9,14 @@ module.exports = function (app) {
 
     //get all users
     app.get('/user/getAll', function (req, res) {
-        Assn9.find(function (err, samples) {
+        Assn9.find({}, { password: 0 }, function (err, users) { // Exclude password field from the response
             if (err)
                 res.send(err);
-            console.log('samples', samples);
-            res.json(samples);
+            console.log('users', users);
+            res.json(users);
         });
     });
+
 
     //login route
     app.post('/user/login', function (req, res) {
@@ -26,99 +27,99 @@ module.exports = function (app) {
         var em = req.body.email;
         var pass = req.body.password;
         if (!em.match(regexEmail)) {
-            res.json( {status: "Email is in invalid format, use northeastern.edu format"} );
-        }
-        else if (!pass.match(regexPwd)) {
-            res.json( {status: "Password is in invalid format, follow password rules : 1 Uppercase Character, 1 lower character, 1 special character, 1 digit and minimum 8 characters"} );
-        }
-        else {
+            res.json({ status: "Email is in invalid format, use northeastern.edu format" });
+        } else if (!pass.match(regexPwd)) {
+            res.json({ status: "Password is in invalid format, follow password rules : 1 Uppercase Character, 1 lower character, 1 special character, 1 digit and minimum 8 characters" });
+        } else {
             var query = { email: req.body.email };
             Assn9.findOne(query, function (err, user) {
                 if (err) {
-                    res.json( {status: err} );
-                }
-                else {
+                    res.json({ status: err });
+                } else {
                     console.log("User: " + user);
                     if (user != null) {
                         bcrypt.compare(req.body.password, user.password, function (err, result) {
                             console.log("Result: " + result);
                             if (result) {
                                 token = jwt.sign(
-                                    { email: em, password: pass, type: "user" },
+                                    { email: em, password: pass, type: user.type },
                                     "assignment9",//secret key
                                     { expiresIn: "90d" }
-                                  );
-                                  let options = {
+                                );
+                                let options = {
                                     maxAge: 1000 * 60 * 60 * 24 * 90, // would expire after 90 days
                                     httpOnly: false, // The cookie only accessible by the web server
                                     //signed: true // Indicates if the cookie should be signed
-                                  };
-
-                                  //res.cookie("token", token, options); //
-                                  res.json( {status: "ok", data: token, email:em});                               
-                            }
-                            else {
-                                res.json( {status: "Incorrect Password, try again!"} );
+                                };
+                                //res.cookie("token", token, options); //
+                                res.json({ status: "ok", data: token, email: em, type: user.type });
+                            } else {
+                                res.json({ status: "Incorrect Password, try again!" });
                             }
                         });
-                    }
-                    else {
-                        res.json( {status: "User does not exists!"} );
+                    } else {
+                        res.json({ status: "User does not exists!" });
                     }
                 }
             });
         }
     });
+    
 
     //insert route
-    app.post('/user/insert', function (req, res) {
-        console.log(req.body);
-        var regexEmail = /[a-z0-9]+@northeastern.edu/;
-        var regexPwd = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%&*]).{8,}$/;
-        var regExName = /^[a-zA-Z\s]+$/;
-        var em = req.body.email;
-        var pass = req.body.password;
-        var fname = req.body.full_name;
-        var query = { email: req.body.email };
-        if (!fname.match(regExName)) {
-            res.send("Name is in invalid format");
-        }
-        else if (!em.match(regexEmail)) {
-            res.send("Email is in invalid format, use northeastern.edu format");
-        }
-        else if (!pass.match(regexPwd)) {
-            res.send("Password is in invalid format, follow password rules : 1 Uppercase Character, 1 lower character, 1 special character, 1 digit and minimum 8 characters");
-        }
-        else {
-            Assn9.count(query, function (err, count) {
+app.post('/user/insert', function (req, res) {
+    console.log(req.body);
+    var regexEmail = /[a-z0-9]+@northeastern.edu/;
+    var regexPwd = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%&*]).{8,}$/;
+    var regExName = /^[a-zA-Z\s]+$/;
+    var em = req.body.email;
+    var pass = req.body.password;
+    var fname = req.body.full_name;
+    var userType = req.body.type; // Extracting user type from request
 
-                if (err) {
-                    res.send(err);
-                }
-                if (count == 1) {
-
-                    res.send("Email Id Exists!");
-                }
-                else {
-                    bcrypt.genSalt(saltRounds, function (err, salt) {
-                        bcrypt.hash(req.body.password, salt, function (err, hash) {
-                            var record = new Assn9({
-                                full_name: req.body.full_name,
-                                email: req.body.email,
-                                password: hash
-                            });
-                            record.save(function (err, rec) {
-                                if (err)
-                                    res.send(err);
-                                console.log('Saved ' + rec);
-                                res.send("Created User successfully");
-                            });
+    var query = { email: req.body.email };
+    if (!fname.match(regExName)) {
+        res.send("Name is in invalid format");
+    }
+    else if (!em.match(regexEmail)) {
+        res.send("Email is in invalid format, use northeastern.edu format");
+    }
+    else if (!pass.match(regexPwd)) {
+        res.send("Password is in invalid format, follow password rules : 1 Uppercase Character, 1 lower character, 1 special character, 1 digit and minimum 8 characters");
+    }
+    else if (!['employee', 'admin'].includes(userType)) { // Check if user type is valid
+        res.send("Invalid user type. User type must be 'employee' or 'admin'");
+    }
+    else {
+        Assn9.count(query, function (err, count) {
+            if (err) {
+                res.send(err);
+            }
+            if (count == 1) {
+                res.send("Email Id Exists!");
+            }
+            else {
+                bcrypt.genSalt(saltRounds, function (err, salt) {
+                    bcrypt.hash(req.body.password, salt, function (err, hash) {
+                        var record = new Assn9({
+                            full_name: req.body.full_name,
+                            email: req.body.email,
+                            password: hash,
+                            type: userType // Saving user type in the database
+                        });
+                        record.save(function (err, rec) {
+                            if (err)
+                                res.send(err);
+                            console.log('Saved ' + rec);
+                            res.send("Created User successfully");
                         });
                     });
-                }
-            });
-        }
-    });
+                });
+            }
+        });
+    }
+});
+
 
     //update route
     app.put('/user/edit', function (req, res) {
