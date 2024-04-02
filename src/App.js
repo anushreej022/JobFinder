@@ -33,40 +33,37 @@ function App() {
     return (
         <div className="App">
             <Router>
-                <Navbar bg="primary" variant="dark">
-                    <Container>
-                        <Navbar.Brand href="/">Job website</Navbar.Brand>
-                        <Nav className="me-auto">
-                            <Nav.Link href="/">Home</Nav.Link>
-                            {!isLoggedIn && <Nav.Link href="/login">Login</Nav.Link>}
-                            {isLoggedIn && <Nav.Link onClick={handleLogout}>Logout</Nav.Link>}
-                            <Nav.Link href="/about">About</Nav.Link>
-                            <Nav.Link href="/contact">Contact</Nav.Link>
-                            <Nav.Link href="/jobs">Jobs</Nav.Link>
-                            <Nav.Link href="/companies">Company Showcase</Nav.Link>
-                        </Nav>
-                    </Container>
-                </Navbar>
-                <Routes>
-                    <Route
-                        path="/"
-                        element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
-                    />
-                    <Route
-                        path="/login"
-                        element={<Login onLogin={handleLogin} />}
-                    />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/jobs" element={<Jobs />} />
-                    <Route path="/companies" element={<CompanyShowcase />} />
-                    {isLoggedIn && userType === 'admin' && (
-                        <Route path="/admin" element={<Admin />} />
-                    )}
-                    <Route path="*" element={<Navigate to="/" />} />
-                </Routes>
-                <hr />
-                <Footer />
+                {!isLoggedIn && <Login onLogin={handleLogin} />}
+                {isLoggedIn && (
+                    <>
+                        <Navbar bg="primary" variant="dark">
+                            <Container>
+                                <Navbar.Brand href="/">Job website</Navbar.Brand>
+                                <Nav className="me-auto">
+                                    <Nav.Link href="/">Home</Nav.Link>
+                                    <Nav.Link onClick={handleLogout}>Logout</Nav.Link>
+                                    <Nav.Link href="/about">About</Nav.Link>
+                                    <Nav.Link href="/contact">Contact</Nav.Link>
+                                    <Nav.Link href="/jobs">Jobs</Nav.Link>
+                                    <Nav.Link href="/companies">Company Showcase</Nav.Link>
+                                </Nav>
+                            </Container>
+                        </Navbar>
+                        <Routes>
+                            <Route path="/" element={<Home />} />
+                            <Route path="/about" element={<About />} />
+                            <Route path="/contact" element={<Contact />} />
+                            <Route path="/jobs" element={<Jobs />} />
+                            <Route path="/companies" element={<CompanyShowcase />} />
+                            {userType === 'admin' && (
+                                <Route path="/admin" element={<Admin />} />
+                            )}
+                            <Route path="*" element={<Navigate to="/" />} />
+                        </Routes>
+                        <hr />
+                        <Footer />
+                    </>
+                )}
             </Router>
         </div>
     );
