@@ -1,95 +1,55 @@
+import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
-import React, { Component } from "react";
-import { Col, Button, Row, Container, Card, Form } from "react-bootstrap";
 
-export default class Login extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            email: "",
-            password: "",
-        };
-        this.handleSubmit = this.handleSubmit.bind(this);
-    }
-    handleSubmit(e) {
-        e.preventDefault();
-        const { email, password } = this.state;
-        console.log(email, password);
-        
-        axios.post("http://localhost:8080/user/login", {
-            email,
-            password,
-        })
-        .then((response) => {
-            console.log(response.data);
-            if (response.data.status === "ok") {
-                alert("Login Successful! Welcome " + response.data.email);
-                
-                    const date = new Date();
-                    date.setTime(date.getTime() + (90 * 24 * 60 * 60 * 1000));
-                    const expires = "expires=" + date.toUTCString();
-                    document.cookie = "token" + "=" + response.data.data + ";" + expires + ";path=/";
-                    console.log(response.data.data);
-            
-                
-                window.location.href = "./about";
-            }
-            else {
-                alert(response.data.status);
-            }
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
-    }
-    
-    render() {
-        return (
-            <div>
-                <Container>
-                    <Row className="vh-100 d-flex justify-content-center align-items-center">
-                        <Col md={8} lg={6} xs={12}>
-                            <div className="border border-3 border-primary"></div>
-                            <Card className="shadow">
-                                <Card.Body>
-                                    <div className="mb-3 mt-md-4">
-                                        <h2 className="fw-bold mb-2 text-uppercase ">LOGIN</h2>
-                                        <p className=" mb-5">Please enter your email and password to login</p>
-                                        <div className="mb-3">
-                                            <Form onSubmit={this.handleSubmit}>
-                                                <Form.Group className="mb-3" controlId="formBasicEmail">
-                                                    <Form.Label className="text-center">
-                                                        Email address
-                                                    </Form.Label>
-                                                    <Form.Control type="email" placeholder="Enter email" onChange={(e) => this.setState({ email: e.target.value })} />
-                                                </Form.Group>
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
+  const error = useSelector((state) => state.auth.error);
 
-                                                <Form.Group
-                                                    className="mb-3"
-                                                    controlId="formBasicPassword"
-                                                >
-                                                    <Form.Label>Password</Form.Label>
-                                                    <Form.Control type="password" placeholder="Password" onChange={(e) => this.setState({ password: e.target.value })} />
-                                                </Form.Group>
-                                                <Form.Group
-                                                    className="mb-3"
-                                                    controlId="formBasicCheckbox"
-                                                >
-                                                </Form.Group>
-                                                <div className="d-grid">
-                                                    <Button variant="primary" type="submit">
-                                                        Login
-                                                    </Button>
-                                                </div>
-                                            </Form>
-                                        </div>
-                                    </div>
-                                </Card.Body>
-                            </Card>
-                        </Col>
-                    </Row>
-                </Container>
-            </div>
-        );
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post('/user/login', { email, password });
+      const { status, data, type } = response.data;
+
+      if (status === 'ok') {
+        dispatch({ type: 'LOGIN_SUCCESS', payload: { data, type } }); // Dispatch action on successful login
+        if (type === 'admin') {
+          // Redirect admin to admin page
+          window.location.href = '/admin';
+        } else {
+          // Redirect employee to home page
+          window.location.href = '/home';
+        }
+      } else {
+        dispatch({ type: 'LOGIN_FAILURE', payload: status }); // Dispatch action on login failure
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      dispatch({ type: 'LOGIN_FAILURE', payload: 'Internal server error' }); // Dispatch action on server error
     }
-}
+  };
+
+  return (
+    <div>
+      <h2>Login</h2>
+      <form onSubmit={handleLogin}>
+        <div>
+          <label>Email:</label>
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        </div>
+        <div>
+          <label>Password:</label>
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        </div>
+        <button type="submit">Login</button>
+        {error && <p>{error}</p>}
+      </form>
+    </div>
+  );
+};
+
+export default Login;

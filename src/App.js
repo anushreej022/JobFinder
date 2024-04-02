@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Admin from './pages/Admin'; // Import the Admin component
 import Home from './pages/Home';
 import About from './pages/About';
@@ -14,7 +14,21 @@ import Jobs from './pages/Jobs';
 import CompanyShowcase from './pages/CompanyShowcase';
 
 function App() {
-    const userType = localStorage.getItem('userType');
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // State to track login status
+    const [userType, setUserType] = useState('');
+
+    // Function to handle login
+    const handleLogin = (userType) => {
+        setIsLoggedIn(true);
+        setUserType(userType);
+    };
+
+    // Function to handle logout
+    const handleLogout = () => {
+        setIsLoggedIn(false);
+        setUserType('');
+        localStorage.removeItem('userType'); // Clear userType from localStorage
+    };
 
     return (
         <div className="App">
@@ -24,7 +38,8 @@ function App() {
                         <Navbar.Brand href="/">Job website</Navbar.Brand>
                         <Nav className="me-auto">
                             <Nav.Link href="/">Home</Nav.Link>
-                            <Nav.Link href="/login">Login</Nav.Link>
+                            {!isLoggedIn && <Nav.Link href="/login">Login</Nav.Link>}
+                            {isLoggedIn && <Nav.Link onClick={handleLogout}>Logout</Nav.Link>}
                             <Nav.Link href="/about">About</Nav.Link>
                             <Nav.Link href="/contact">Contact</Nav.Link>
                             <Nav.Link href="/jobs">Jobs</Nav.Link>
@@ -33,14 +48,22 @@ function App() {
                     </Container>
                 </Navbar>
                 <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={<Login />} />
+                    <Route
+                        path="/"
+                        element={isLoggedIn ? <Home /> : <Navigate to="/login" />}
+                    />
+                    <Route
+                        path="/login"
+                        element={<Login onLogin={handleLogin} />}
+                    />
                     <Route path="/about" element={<About />} />
                     <Route path="/contact" element={<Contact />} />
                     <Route path="/jobs" element={<Jobs />} />
                     <Route path="/companies" element={<CompanyShowcase />} />
-                    {userType === 'admin' && <Route path="/admin" element={<Admin />} />} {/* Restrict access to Admin page */}
-                    <Route path="*" element={<Navigate to="/" />} /> {/* Redirect to Home for any other route */}
+                    {isLoggedIn && userType === 'admin' && (
+                        <Route path="/admin" element={<Admin />} />
+                    )}
+                    <Route path="*" element={<Navigate to="/" />} />
                 </Routes>
                 <hr />
                 <Footer />

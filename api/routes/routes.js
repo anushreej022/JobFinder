@@ -4,6 +4,8 @@ const multer = require('multer');
 const path = require('path');
 const jwt = require('jsonwebtoken');
 const saltRounds = 10;
+const Job = require('../models/job'); // Assuming you have a Job model defined
+
 module.exports = function (app) {
     //server routes 
 
@@ -196,6 +198,7 @@ app.post('/user/insert', function (req, res) {
                 }
             });
 
+    
         }
     });
 // Define storage for the uploaded images
@@ -274,6 +277,37 @@ app.post('/user/logout', (req, res) => {
     res.status(200).send('Logout successful');
 });
 
+// Create a job API endpoint
+app.post('/create/job', function (req, res) {
+    const { companyName, jobTitle, description, salary } = req.body;
+    // Create a new job record
+    const newJob = new Job({
+        companyName,
+        jobTitle,
+        description,
+        salary
+        // Add more fields as needed
+    });
+    // Save the job record to the database
+    newJob.save()
+        .then(job => {
+            res.status(201).json(job); // Return the created job object
+        })
+        .catch(error => {
+            res.status(500).json({ error: 'Internal server error' });
+        });
+});
+
+    // Get all jobs API endpoint
+    app.get('/get/jobs', function (req, res) {
+        // Retrieve all jobs from the database
+        Job.find({})
+            .then(jobs => {
+                res.status(200).json(jobs); // Return the list of jobs as JSON
+            })
+            .catch(error => {
+                res.status(500).json({ error: 'Internal server error' });
+            });
+    });
 
 }
-//session:
