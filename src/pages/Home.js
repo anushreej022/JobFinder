@@ -6,6 +6,11 @@ import image3 from '../images/image3.webp';
 import image4 from '../images/image4.webp';
 import image5 from '../images/image5.jpg';
 import Cards from "./Cards/Cards";
+import Navbar from 'react-bootstrap/Navbar';
+import Nav from 'react-bootstrap/Nav';
+import Container from 'react-bootstrap/Container';
+import Footer from './Footer/Footer';
+
 
 function Home() {
     var cardStyle = {
@@ -15,6 +20,19 @@ function Home() {
   
   return (
     <div>
+        <Navbar bg="primary" variant="dark">
+            <Container>
+              <Navbar.Brand href="/">Job website</Navbar.Brand>
+              <Nav className="me-auto">
+                <Nav.Link href="/">Home</Nav.Link>
+                <Nav.Link href="/about">About</Nav.Link>
+                <Nav.Link href="/contact">Contact</Nav.Link>
+                <Nav.Link href="/jobs">Jobs</Nav.Link>
+                <Nav.Link href="/companies">Company Showcase</Nav.Link>
+              </Nav>
+            </Container>
+          </Navbar>
+
         <header className="py-5 bg-light border-bottom mb-4">
             <div className="container">
                 <div className="text-center my-5">
@@ -129,6 +147,7 @@ function Home() {
             </div>
         </div>
         <Cards id="Home"></Cards>
+        <Footer/>
     </div>
   )
 }

@@ -1,30 +1,27 @@
 import React, { useState } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'; // Import useSelector
 import axios from 'axios';
 import { loginSuccess, loginFailure } from './actions/authActions';
+import { Navigate } from 'react-router-dom'; // Import Navigate component
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [userType, setUserType] = useState('admin'); // Default user type
+  const [userType, setUserType] = useState('admin');
   const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.auth.user !== null); // Check if user is logged in
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:8080/user/login', { email, password });
-      const { status, data, type } = response.data;
+      const response = await axios.post('http://localhost:8080/user/login', { email, password, userType });
+      const { status, data } = response.data;
 
       if (status === 'ok') {
-        dispatch(loginSuccess({ data, type }));
-        if (type === 'admin') {
-          window.location.href = '/admin';
-        } else if (type === 'employee') {
-          window.location.href = '/home'; // Redirect to homepage route
-        }
+        dispatch(loginSuccess(data.token, userType)); // Dispatch loginSuccess with token and userType
       } else {
-        dispatch(loginFailure(status));
+        dispatch(loginFailure(data.message));
       }
     } catch (error) {
       console.error('Login failed:', error);
@@ -32,17 +29,22 @@ const Login = () => {
     }
   };
 
+  // If user is logged in, redirect to appropriate page based on userType
+  if (isLoggedIn) {
+    return <Navigate to={userType === 'admin' ? '/admin' : '/home'} replace />;
+  }
+
   return (
     <div>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <div>
           <label>Email:</label>
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div>
           <label>Password:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         <div>
           <label>User Type:</label>
