@@ -3,11 +3,9 @@ import "./About.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import axios from "axios";
-import { useSelector } from "react-redux";
 
 function About() {
   const navigate = useNavigate();
-  const type = useSelector((state) => state.type.value);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -15,13 +13,14 @@ function About() {
       .get("http://localhost:8000/user/checkSession", {
         headers: {
           Authorization: "Bearer " + token,
+          "User-Type": "Employee",
         },
       })
       .then((res) => {
         if (!res.data.valid) {
           navigate("/");
-        } else if (type.userType !== "Employee") {
-          navigate("/forbidden");
+        } else if (!res.data.userMatch) {
+          navigate("/adminForbidden");
         }
       })
       .catch((error) => {

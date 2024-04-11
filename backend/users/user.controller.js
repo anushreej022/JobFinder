@@ -4,6 +4,7 @@ const { genSaltSync, hashSync } = require("bcrypt");
 const path = require("path");
 var bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const { decode } = require("punycode");
 
 module.exports = {
   createUser: async (req, res) => {
@@ -69,7 +70,7 @@ module.exports = {
         {},
         { _id: 0, __v: 0, password: 0, imagePaths: 0 }
       );
-      res.json(users);
+      return res.json(users);
     } catch (err) {
       res.status(500).json({ message: "Internal Server Error" });
     }
@@ -188,7 +189,7 @@ module.exports = {
         const stat = fs.statSync(filePath);
 
         if (stat.isDirectory()) {
-          readImageFiles(filePath, fileList); // Recursively traverse subdirectories
+          readImageFiles(filePath, fileList);
         } else if (/\.(jpg|jpeg|png|gif)$/i.test(filePath)) {
           fileList.push(filePath);
         }
@@ -205,7 +206,6 @@ module.exports = {
     const modifiedPaths = imagePaths.map((path) =>
       path.replace(/^.*public\\/, "")
     );
-    console.log(modifiedPaths);
     res.json(modifiedPaths);
   },
 
@@ -213,9 +213,13 @@ module.exports = {
     const { username, password } = req.body;
     const user = await User.findOne({ email: username });
     if (user && bcrypt.compareSync(password, user.password)) {
-      const token = jwt.sign({ userName: user.email }, "secret_key", {
-        expiresIn: "1h",
-      });
+      const token = jwt.sign(
+        { userName: user.email, userType: user.type },
+        "secret_key",
+        {
+          expiresIn: "1h",
+        }
+      );
       req.session.token = token;
 
       return res.status(200).json({
@@ -236,16 +240,13 @@ module.exports = {
       jwt.verify(token.split(" ")[1], "secret_key", (err, decoded) => {
         if (err) {
           return res.json({ valid: false, userMatch: false });
-        } 
-        else if(decoded.userType !== req.headers["user-type"]) {
+        } else if (decoded.userType !== req.headers["user-type"]) {
           return res.json({ valid: true, userMatch: false });
         }
-       
-          return res.json({ valid: true, userMatch: false });
-        
+        return res.json({ valid: true, userMatch: true });
       });
     } else {
-      return res.json({ valid: false });
+      return res.json({ valid: false, userMatch: false });
     }
   },
 };

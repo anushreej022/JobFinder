@@ -25,19 +25,19 @@ function Navbar({ title }) {
             <ul>
               <li>
                 <span
-                  onClick={() => handleItemClick("home")}
-                  className={activeItem === "home" ? "active" : ""}
+                  onClick={() => handleItemClick("adminHome")}
+                  className={activeItem === "adminHome" ? "active" : ""}
                 >
-                  Home
+                  Employees
                 </span>
               </li>
 
               <li>
                 <span
-                  onClick={() => handleItemClick("listing")}
-                  className={activeItem === "listing" ? "active" : ""}
+                  onClick={() => handleItemClick("addJobs")}
+                  className={activeItem === "addJobs" ? "active" : ""}
                 >
-                  Listings
+                  Add Jobs
                 </span>
               </li>
 

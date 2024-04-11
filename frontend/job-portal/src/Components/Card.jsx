@@ -1,30 +1,55 @@
-import "./Card.css";
-import React from "react";
-import { Button } from "@mui/material";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
 import { Link } from "@mui/icons-material";
 
-function Card(props) {
+function CustomCard(props) {
   return (
-    <div>
-      <div className="job-card">
-        <div className="desc">
-          <h4>{props.title}</h4>
-          <p>{props.description}</p>
-          <p style={{ fontStyle: "italic" }}>{props.lastUpdated}</p>
-          <Button
-            variant="contained"
-            color="primary"
-            href="https://www.indeed.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            endIcon={<Link />}
-          >
-            Apply
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Card className="job-card" style={{ backgroundColor: "#9FAFCA" }}>
+      <CardContent style={{ paddingBottom: "8px" }}>
+        <Typography
+          variant="h6"
+          component="h2"
+          fontWeight="bold"
+          fontFamily="Poppins, sans-serif"
+        >
+          {props.name}: {props.title}
+        </Typography>
+        <Typography
+          color="textSecondary"
+          style={{
+            fontStyle: "italic",
+            fontFamily: "Poppins, sans-serif",
+            margin: "16px 0",
+          }}
+        >
+          Salary: {props.salary}
+        </Typography>
+        <Typography
+          variant="body2"
+          component="p"
+          style={{
+            fontFamily: "Poppins, sans-serif",
+            margin: "16px 0",
+            fontSize: "1rem",
+          }}
+        >
+          {props.description}
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          href="https://www.indeed.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          endIcon={<Link />}
+        >
+          Apply
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
 
-export default Card;
+export default CustomCard;

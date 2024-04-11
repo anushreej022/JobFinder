@@ -11,14 +11,18 @@ import Home from "./Pages/Home/Home";
 import Employees from "./Pages/Employees/Employees";
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider } from "react-redux";
-import typeReducer from "./features/type";
 import userReducer from "./features/users";
-import Forbidden from "./Pages/Forbidden/Forbidden";
+import jobReducer from "./features/jobs";
+import galleryReducer from "./features/gallery";
+import EmployeeForbidden from "./Pages/EmployeeForbidden/EmployeeForbidden";
+import AdminForbidden from "./Pages/AdminForbidden/AdminForbidden";
+import AddJobs from "./Pages/AddJobs/AddJobs";
 
 const store = configureStore({
   reducer: {
-    type: typeReducer,
     users: userReducer,
+    jobs: jobReducer,
+    gallery: galleryReducer,
   },
 });
 
@@ -36,8 +40,10 @@ root.render(
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/about" element={<About />} />
         <Route path="/home" element={<Home />} />
-        <Route path="/employees" element={<Employees />} />
-        <Route path="/forbidden" element={<Forbidden />} />
+        <Route path="/adminHome" element={<Employees />} />
+        <Route path="/employeeForbidden" element={<EmployeeForbidden />} />
+        <Route path="/adminForbidden" element={<AdminForbidden />} />
+        <Route path="/addJobs" element={<AddJobs />} />
       </Routes>
     </Provider>
   </BrowserRouter>

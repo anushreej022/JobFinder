@@ -10,7 +10,7 @@ const app = express();
 app.use(
   cors({
     origin: ["http://localhost:3000"],
-    methods: ["POST", "GET"],
+    methods: ["POST", "GET", "DELETE"],
     credentials: true,
   })
 );
@@ -30,7 +30,10 @@ app.use(
 );
 
 const userRouter = require("./users/user.router");
+const jobRouter = require("./jobs/job.router");
+
 app.use("/user", userRouter);
+app.use("", jobRouter);
 
 mongoose
   .connect(url)

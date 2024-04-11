@@ -3,12 +3,9 @@ import { MouseEvent } from "react";
 import axios from "axios";
 import "./App.css";
 import $ from "jquery";
-import { useDispatch } from "react-redux";
-import { setType } from "./features/type";
 
 function App() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const userLogin = (event: MouseEvent) => {
     if (event) {
@@ -28,10 +25,8 @@ function App() {
         .then((response) => {
           const { message, userType, token } = response.data;
           sessionStorage.setItem("token", token);
-          dispatch(setType({ userType: userType }));
-
           if (userType === "Admin") {
-            navigate("/employees");
+            navigate("/adminHome");
           } else {
             navigate("/home");
           }

@@ -37,7 +37,7 @@ function Navbar({ title }) {
                   onClick={() => handleItemClick("listing")}
                   className={activeItem === "listing" ? "active" : ""}
                 >
-                  Listings
+                  Jobs
                 </span>
               </li>
 

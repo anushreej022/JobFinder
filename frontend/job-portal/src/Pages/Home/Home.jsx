@@ -1,9 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Avatar, Typography, Grid, Card, CardContent } from "@mui/material";
 import Navbar from "../../EmployeeNavbar/Navbar";
 import "./Home.css";
 import axios from "axios";
-import { useSelector } from "react-redux";
 
 function Home() {
   const testimonials = [
@@ -28,7 +28,6 @@ function Home() {
   ];
 
   const navigate = useNavigate();
-  const type = useSelector((state) => state.type.value);
 
   useEffect(() => {
     const token = sessionStorage.getItem("token");
@@ -36,14 +35,14 @@ function Home() {
       .get("http://localhost:8000/user/checkSession", {
         headers: {
           Authorization: "Bearer " + token,
+          "User-Type": "Employee",
         },
       })
       .then((res) => {
-        console.log(type.userType);
         if (!res.data.valid) {
           navigate("/");
-        } else if (type.userType !== "Employee") {
-          navigate("/forbidden");
+        } else if (!res.data.userMatch) {
+          navigate("/adminForbidden");
         }
       })
       .catch((error) => {
@@ -55,15 +54,19 @@ function Home() {
     <>
       <Navbar title="home" />
       <h1 className="header">Testimonials</h1>
-      <div className="testimonials">
+      <Grid container spacing={2} className="testimonials">
         {testimonials.map((testimonial) => (
-          <div key={testimonial.id} className="testimonial">
-            <img src={testimonial.image} alt={testimonial.author} />
-            <p>{testimonial.text}</p>
-            <p className="author">- {testimonial.author}</p>
-          </div>
+          <Grid item xs={12} sm={4} key={testimonial.id}>
+            <Card>
+              <CardContent>
+                <Avatar alt={testimonial.author} src={testimonial.image} sx={{ width: 100, height: 100, margin: "auto" }} />
+                <Typography variant="body1" component="p">{testimonial.text}</Typography>
+                <Typography variant="caption" component="p" className="author">- {testimonial.author}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
+      </Grid>
     </>
   );
 }
