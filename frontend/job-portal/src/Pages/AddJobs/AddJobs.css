@@ -22,7 +22,7 @@ input#description {
     width: 300px;
 }
 .add-job-btn {
-    background-color: #007bff;
+    background-color: #ff0099;
     color: #fff;
     border: none;
     padding: 10px 15px;
@@ -34,7 +34,7 @@ input#description {
 }
 
 .add-job-btn:hover {
-    background-color: #0056b3;
+    background-color: #e415da;
 }
 
 @media (max-width: 480px) {

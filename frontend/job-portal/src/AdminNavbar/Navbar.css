@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css?family=Poppins&display=swap');
 
 :root {
-    --primary-color: #05386b;
+    --primary-color: #6b0544;
     --tertiary-color: #edf5e1;
     --overlay-color: rgba(255, 255, 255, 0.9);
     --mono-font: "SF Mono", "Fira Code", "Fira Mono", "Roboto Mono", monospace;
@@ -19,7 +19,7 @@ body {
     height: 10vh;
     width: 95vw;
     margin: auto;
-    background-color: #0E387A;
+    background-color: #eb1c9c;
     color: #fff;
 }
 
@@ -42,7 +42,7 @@ li span {
 }
 
 .active {
-    background-color: #42a5f5;
+    background-color: #a74e9c;
 }
 
 /* Tablets */
@@ -73,7 +73,7 @@ li span {
         height: 4.5vh;
         width: 95vw;
         margin: auto;
-        background-color: #0E387A;
+        background-color: #9b359e;
         color: #fff;
     }
 
